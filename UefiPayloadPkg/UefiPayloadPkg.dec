@@ -103,6 +103,14 @@
 #                            declaration, other packages should not.
 #
 ################################################################################
+[PcdsFeatureFlag]
+  ## When TRUE, BlSupportDxe retags the coreboot framebuffer table entry
+  #  (LB_TAG_FRAMEBUFFER) to UNUSED at ReadyToBoot, after the GOP is built. On a
+  #  coreboot host whose framebuffer sits inside a PCI BAR (e.g. VirtualBox vboxvga)
+  #  the guest kernel's simple-framebuffer reservation otherwise blocks the real DRM
+  #  driver from claiming the BAR. Default FALSE (no behavioural change).
+  gUefiPayloadPkgTokenSpaceGuid.PcdStripCorebootFramebufferTag|FALSE|BOOLEAN|0x10000050
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
 ## Indicates the base address of the payload binary in memory
 gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase|0|UINT32|0x10000001

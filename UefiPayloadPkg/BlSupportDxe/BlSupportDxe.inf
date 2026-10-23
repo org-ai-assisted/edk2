@@ -47,6 +47,8 @@
   BaseMemoryLib
   HobLib
   MemoryAllocationLib
+  BlParseLib
+  PcdLib
 
 [LibraryClasses.AARCH64]
   ArmMmuLib
@@ -56,6 +58,7 @@
   gEfiFirmwareInfoHobGuid
   gEfiGraphicsInfoHobGuid
   gEfiSystemResourceTableGuid
+  gEfiEventReadyToBootGuid
   gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
   gEfiTpmDeviceInstanceTpm12Guid      ## SOMETIMES_CONSUMES
 
@@ -73,6 +76,9 @@
 
 [Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[FeaturePcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdStripCorebootFramebufferTag
 
 [Depex]
   TRUE
