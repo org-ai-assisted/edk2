@@ -1956,6 +1956,8 @@ EfiBootManagerBoot (
   UINTN                      FileSize;
   EFI_BOOT_LOGO_PROTOCOL     *BootLogo;
   EFI_EVENT                  LegacyBootEvent;
+  EFI_EVENT                  TimerEvent;
+  EFI_EVENT                  WaitList[2];
   EFI_INPUT_KEY              Key;
   UINTN                      Index;
   UINT8                     *SecureBoot;
@@ -2123,9 +2125,20 @@ EfiBootManagerBoot (
         }
       }
       if (gST->ConIn != NULL) {
-        Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
-        ASSERT_EFI_ERROR (Status);
-        ASSERT (Index == 0);
+        //
+        // Wait for a key, but time out (10 s) so an unattended/headless boot does not
+        // hang here forever -- let the caller fall through to the next boot option.
+        //
+        Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
+        if (!EFI_ERROR (Status)) {
+          WaitList[0] = gST->ConIn->WaitForKey;
+          WaitList[1] = TimerEvent;
+          gBS->SetTimer (TimerEvent, TimerRelative, (UINT64)100000000U);
+          gBS->WaitForEvent (2, WaitList, &Index);
+          gBS->CloseEvent (TimerEvent);
+        } else {
+          gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
+        }
         while (!EFI_ERROR (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key))) {}
       }
 
